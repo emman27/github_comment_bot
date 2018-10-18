@@ -17,11 +17,12 @@ const (
 // ReceiveIssueComment deals with the event of a comment being made on a PR or issue
 // It will do the following actions:
 func ReceiveIssueComment(e *github.IssueCommentEvent) (map[string]interface{}, error) {
+	var err error
 	body := *(e.Comment.Body)
 	logrus.Debug(body)
 	if strings.HasPrefix(body, CommandCI) {
 		logrus.Info("Triggered CI")
-		actions.CreateComment(*e.Repo.Owner.Name, *e.Repo.Name, int(*e.Issue.ID), MessageCIStarted)
+		err = actions.CreateComment(e.GetRepo().GetOwner().GetLogin(), e.GetRepo().GetName(), e.Issue.GetNumber(), MessageCIStarted)
 	}
-	return map[string]interface{}{}, nil
+	return map[string]interface{}{}, err
 }
